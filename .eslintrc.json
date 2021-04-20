@@ -21,7 +21,8 @@
   "plugins": [
       "react",
       "@typescript-eslint",
-      "eslint-plugin-prettier"
+      "eslint-plugin-prettier",
+      "typescript"
   ],
   "rules": {
     "react/react-in-jsx-scope": "off",
