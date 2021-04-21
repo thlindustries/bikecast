@@ -5,6 +5,7 @@ export default createGlobalStyle`
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+
   }
 
   :root {
@@ -43,6 +44,8 @@ export default createGlobalStyle`
   body, input, textarea, button{
    font: 500 1rem Inter sans-serif;
    color: var(--gray-500);
+   overflow-x: hidden;
+
   }
 
   h1, h2, h3, h4, h5, h6{
@@ -61,5 +64,26 @@ export default createGlobalStyle`
 
   button{
     cursor: pointer;
+  }
+
+  .hasVerticalScroll{
+    overflow-x: hidden !important;
+
+    &::-webkit-scrollbar {
+      display: unset;
+    }
+    &::-webkit-scrollbar {
+      width: 4px !important;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--green-500);
+      border-radius: 8px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
   }
 `;

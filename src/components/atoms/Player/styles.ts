@@ -1,17 +1,32 @@
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 interface ProgressProps {
   at: number;
 }
 
-export const Container = styled.div`
+interface ContainerProps {
+  isCollapsed: boolean;
+}
+
+const load = keyframes`
+  0% { opacity: 0 }
+  100% { opacity: 1 }
+`;
+
+const unLoad = keyframes`
+  0% { opacity: 1 }
+  100% { opacity: 0 }
+`;
+
+export const Container = styled.div<ContainerProps>`
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
 
   padding: 3rem 4rem;
-  width: 25.6rem;
+
   height: 100vh;
 
   background: var(--purple-500);
@@ -32,6 +47,73 @@ export const Container = styled.div`
   footer {
     align-self: stretch;
   }
+
+  transition: width 0.4s;
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    animation-delay: 0.4s;
+
+    width: 100%;
+    height: 100%;
+  }
+
+  ${(props) =>
+    props.isCollapsed
+      ? css`
+          .content {
+            animation: ${unLoad} 0.4s;
+            opacity: 0;
+          }
+          width: 6rem;
+        `
+      : css`
+          .content {
+            animation: ${load} 0.4s;
+            opacity: 1;
+          }
+          width: 25.6rem;
+        `}
+`;
+
+export const CollapseButton = styled.div<ContainerProps>`
+  position: absolute;
+  display: flex;
+
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  background: var(--green-500);
+
+  justify-content: center;
+  align-items: center;
+
+  top: 4rem;
+  left: -1rem;
+
+  color: var(--white);
+  transition: transform 0.2s, filter 0.2s;
+
+  ${(props) =>
+    props.isCollapsed
+      ? css`
+          transform: rotate(-180deg);
+          &:hover {
+            cursor: pointer;
+            filter: brightness(0.9);
+            transform: scale(1.2) rotate(-180deg);
+          }
+        `
+      : css`
+          &:hover {
+            cursor: pointer;
+            filter: brightness(0.9);
+            transform: scale(1.2);
+          }
+        `}
 `;
 
 export const EmptyPlayer = styled.div`

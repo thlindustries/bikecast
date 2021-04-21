@@ -1,22 +1,127 @@
 import React from 'react';
-import { GetStaticProps, GetStaticPropsResult } from 'next';
+import { GetStaticProps } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
 
-import Head from 'next/head';
+import { format, parseISO } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
 
-const Home: React.FunctionComponent = (props) => {
-  console.log(props);
+import api from 'services/api';
+import { convertDurationToTimeString } from 'utils/functions';
 
-  return (
-    <div>
-      {/* <Head>
-          <title>Poadcastr</title>
-        </Head>
-        <main>
-          <h1>Oi </h1>
-        </main> */}
-    </div>
-  );
+import {
+  Container,
+  LatestEpisodes,
+  AllEpisodes,
+  EpisodeDetails,
+} from 'styles/pages/home';
+
+type Episode = {
+  id: string;
+  title: string;
+  members: string;
+  published_at: string;
+  thumbnail: string;
+  file: {
+    url: string;
+    type: string;
+    duration: number;
+  };
 };
+
+type FormatedEpisode = {
+  id: string;
+  title: string;
+  members: string;
+  publishedAt: string;
+  thumbnail: string;
+  url: string;
+  duration: number;
+  durationAsString: string;
+};
+
+type HomeProps = {
+  latestEpisodes: Array<FormatedEpisode>;
+  allEpisodes: Array<FormatedEpisode>;
+};
+
+const Home: React.FunctionComponent<HomeProps> = ({
+  allEpisodes,
+  latestEpisodes,
+}) => (
+  <Container className="hasVerticalScroll">
+    <LatestEpisodes>
+      <h2>Últimos lançamentos</h2>
+      <ul>
+        {latestEpisodes.map((episode) => (
+          <li key={episode.id}>
+            <Image
+              width={192}
+              height={192}
+              src={episode.thumbnail}
+              alt={episode.title}
+              objectFit="cover"
+            />
+            <EpisodeDetails>
+              <Link href={`/episodes/${episode.id}`}>
+                <span className="episode-title-link">{episode.title}</span>
+              </Link>
+              <p>{episode.members}</p>
+              <span>{episode.publishedAt}</span>
+              <span>{episode.durationAsString}</span>
+            </EpisodeDetails>
+            <button type="button">
+              <img src="/play-green.svg" alt="play green" />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </LatestEpisodes>
+    <AllEpisodes>
+      <h2>Todos episódios</h2>
+      <table cellSpacing={0}>
+        <thead>
+          <tr>
+            <th>-</th>
+            <th>Poadcast</th>
+            <th>Integrantes</th>
+            <th>Data</th>
+            <th>Duração</th>
+            <th>-</th>
+          </tr>
+        </thead>
+        <tbody>
+          {allEpisodes.map((episode) => (
+            <tr key={episode.id}>
+              <td style={{ width: 72 }}>
+                <Image
+                  width={120}
+                  height={120}
+                  src={episode.thumbnail}
+                  alt={episode.title}
+                  objectFit="cover"
+                />
+              </td>
+              <td>
+                <Link href="_blank">
+                  <span className="episode-title-link">{episode.title}</span>
+                </Link>
+              </td>
+              <td>{episode.members}</td>
+              <td style={{ width: 100 }}>{episode.publishedAt}</td>
+              <td>{episode.durationAsString}</td>
+              <td>
+                <button type="button">
+                  <img src="/play-green.svg" alt="Play episode" />
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </AllEpisodes>
+  </Container>
+);
 
 export default Home;
 
@@ -33,15 +138,37 @@ export default Home;
 //   };
 // };
 
-export const getStaticProps: GetStaticProps = async (
-  ctx,
-): Promise<GetStaticPropsResult<any>> => {
-  const response = await fetch('http://localhost:3333/episodes');
-  const data = await response.json();
+export const getStaticProps: GetStaticProps = async (ctx) => {
+  const { data } = await api.get<Array<Episode>>('episodes', {
+    params: {
+      _limit: 12,
+      _sort: 'published_at',
+      _order: 'desc',
+    },
+  });
+
+  const episodes = data.map((episode) => ({
+    id: episode.id,
+    title: episode.title,
+    thumbnail: episode.thumbnail,
+    members: episode.members,
+    publishedAt: format(parseISO(episode.published_at), 'd MMM yy', {
+      locale: ptBR,
+    }),
+    duration: Number(episode.file.duration),
+    durationAsString: convertDurationToTimeString(
+      Number(episode.file.duration),
+    ),
+    url: episode.file.url,
+  }));
+
+  const latestEpisodes = episodes.slice(0, 2);
+  const allEpisodes = episodes.slice(2, episodes.length);
 
   return {
     props: {
-      episodes: data,
+      latestEpisodes,
+      allEpisodes,
     },
     revalidate: 60 * 60 * 1,
   };
