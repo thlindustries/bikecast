@@ -14,7 +14,20 @@ import {
   ThumbContainer,
   Header,
   EpisodeDescription,
-} from './styles';
+} from 'styles/pages/episodes';
+
+type Episode = {
+  id: string;
+  title: string;
+  members: string;
+  published_at: string;
+  thumbnail: string;
+  file: {
+    url: string;
+    type: string;
+    duration: number;
+  };
+};
 
 type FormatedEpisode = {
   id: string;
@@ -32,7 +45,7 @@ type EpisodeProps = {
   episode: FormatedEpisode;
 };
 
-const Episode: React.FC<EpisodeProps> = ({ episode }) => {
+const Episode: React.FunctionComponent<EpisodeProps> = ({ episode }) => {
   const { push } = useRouter();
 
   useEffect(() => {
@@ -76,10 +89,26 @@ const Episode: React.FC<EpisodeProps> = ({ episode }) => {
 
 export default Episode;
 
-export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: [],
-  fallback: 'blocking',
-});
+export const getStaticPaths: GetStaticPaths = async () => {
+  const { data } = await api.get<Episode[]>('episodes', {
+    params: {
+      _limit: 2,
+      _sort: 'published_at',
+      _order: 'desc',
+    },
+  });
+
+  const paths = data.map((episode) => ({
+    params: {
+      slug: episode.id,
+    },
+  }));
+
+  return {
+    paths,
+    fallback: 'blocking',
+  };
+};
 
 export const getStaticProps: GetStaticProps = async (ctx) => {
   const { slug } = ctx.params;

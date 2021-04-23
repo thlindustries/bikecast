@@ -15,6 +15,7 @@ import {
   AllEpisodes,
   EpisodeDetails,
 } from 'styles/pages/home';
+import { usePlayer } from 'hooks/player';
 
 type Episode = {
   id: string;
@@ -48,80 +49,84 @@ type HomeProps = {
 const Home: React.FunctionComponent<HomeProps> = ({
   allEpisodes,
   latestEpisodes,
-}) => (
-  <Container className="hasVerticalScroll">
-    <LatestEpisodes>
-      <h2>Últimos lançamentos</h2>
-      <ul>
-        {latestEpisodes.map((episode) => (
-          <li key={episode.id}>
-            <Image
-              width={192}
-              height={192}
-              src={episode.thumbnail}
-              alt={episode.title}
-              objectFit="cover"
-            />
-            <EpisodeDetails>
-              <Link href={`/episodes/${episode.id}`}>
-                <span className="episode-title-link">{episode.title}</span>
-              </Link>
-              <p>{episode.members}</p>
-              <span>{episode.publishedAt}</span>
-              <span>{episode.durationAsString}</span>
-            </EpisodeDetails>
-            <button type="button">
-              <img src="/play-green.svg" alt="play green" />
-            </button>
-          </li>
-        ))}
-      </ul>
-    </LatestEpisodes>
-    <AllEpisodes>
-      <h2>Todos episódios</h2>
-      <table cellSpacing={0}>
-        <thead>
-          <tr>
-            <th>-</th>
-            <th>Poadcast</th>
-            <th>Integrantes</th>
-            <th>Data</th>
-            <th>Duração</th>
-            <th>-</th>
-          </tr>
-        </thead>
-        <tbody>
-          {allEpisodes.map((episode) => (
-            <tr key={episode.id}>
-              <td style={{ width: 72 }}>
-                <Image
-                  width={120}
-                  height={120}
-                  src={episode.thumbnail}
-                  alt={episode.title}
-                  objectFit="cover"
-                />
-              </td>
-              <td>
-                <Link href="_blank">
+}) => {
+  const { play } = usePlayer();
+
+  return (
+    <Container className="hasVerticalScroll">
+      <LatestEpisodes>
+        <h2>Últimos lançamentos</h2>
+        <ul>
+          {latestEpisodes.map((episode) => (
+            <li key={episode.id}>
+              <Image
+                width={192}
+                height={192}
+                src={episode.thumbnail}
+                alt={episode.title}
+                objectFit="cover"
+              />
+              <EpisodeDetails>
+                <Link href={`/episodes/${episode.id}`}>
                   <span className="episode-title-link">{episode.title}</span>
                 </Link>
-              </td>
-              <td>{episode.members}</td>
-              <td style={{ width: 100 }}>{episode.publishedAt}</td>
-              <td>{episode.durationAsString}</td>
-              <td>
-                <button type="button">
-                  <img src="/play-green.svg" alt="Play episode" />
-                </button>
-              </td>
-            </tr>
+                <p>{episode.members}</p>
+                <span>{episode.publishedAt}</span>
+                <span>{episode.durationAsString}</span>
+              </EpisodeDetails>
+              <button type="button" onClick={() => play(episode)}>
+                <img src="/play-green.svg" alt="play green" />
+              </button>
+            </li>
           ))}
-        </tbody>
-      </table>
-    </AllEpisodes>
-  </Container>
-);
+        </ul>
+      </LatestEpisodes>
+      <AllEpisodes>
+        <h2>Todos episódios</h2>
+        <table cellSpacing={0}>
+          <thead>
+            <tr>
+              <th>-</th>
+              <th>Poadcast</th>
+              <th>Integrantes</th>
+              <th>Data</th>
+              <th>Duração</th>
+              <th>-</th>
+            </tr>
+          </thead>
+          <tbody>
+            {allEpisodes.map((episode) => (
+              <tr key={episode.id}>
+                <td style={{ width: 72 }}>
+                  <Image
+                    width={120}
+                    height={120}
+                    src={episode.thumbnail}
+                    alt={episode.title}
+                    objectFit="cover"
+                  />
+                </td>
+                <td>
+                  <Link href="_blank">
+                    <span className="episode-title-link">{episode.title}</span>
+                  </Link>
+                </td>
+                <td>{episode.members}</td>
+                <td style={{ width: 100 }}>{episode.publishedAt}</td>
+                <td>{episode.durationAsString}</td>
+                <td>
+                  <button type="button" onClick={() => play(episode)}>
+                    <img src="/play-green.svg" alt="Play episode" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </AllEpisodes>
+    </Container>
+  );
+};
 
 export default Home;
 

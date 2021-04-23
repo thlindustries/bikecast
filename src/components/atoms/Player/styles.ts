@@ -4,6 +4,10 @@ interface ProgressProps {
   at: number;
 }
 
+interface FooterProps {
+  empty: boolean;
+}
+
 interface ContainerProps {
   isCollapsed: boolean;
 }
@@ -136,6 +140,35 @@ export const EmptyPlayer = styled.div`
   text-align: center;
 `;
 
+export const CurrentEpisode = styled.div`
+  text-align: center;
+  img {
+    border-radius: 1.5rem;
+  }
+
+  strong {
+    display: block;
+    margin-top: 2rem;
+    font: 600 1.25rem Lexend, sans-serif;
+    line-height: 1.75rem;
+  }
+
+  span {
+    display: block;
+    margin-top: 1rem;
+    opacity: 0.6;
+    line-height: 1.5rem;
+  }
+`;
+
+export const Footer = styled.footer<FooterProps>`
+  ${(props) =>
+    props.empty &&
+    css`
+      opacity: 0.5;
+    `}
+`;
+
 export const Progress = styled.div<ProgressProps>`
   display: flex;
   align-items: center;
@@ -191,8 +224,13 @@ export const ButtonsContainer = styled.div`
       background: var(--purple-400);
     }
 
+    &:disabled {
+      cursor: default;
+    }
+
     transition: 0.2s;
-    &:hover {
+
+    &:hover:not(:disabled) {
       opacity: 0.6;
     }
   }
