@@ -26,14 +26,20 @@ export const ThumbContainer = styled.div`
 
     font-size: 0;
 
-    img {
+    svg {
+      color: var(--white);
+    }
+
+    img,
+    svg {
       transition: transform 0.2s;
     }
 
     transition: filter 0.2s;
     &:hover {
       filter: brightness(0.9);
-      img {
+      img,
+      svg {
         transform: scale(1.2);
       }
     }

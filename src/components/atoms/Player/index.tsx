@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, {
+  useState,
+  useMemo,
+  useRef,
+  useEffect,
+  useCallback,
+} from 'react';
 import Image from 'next/image';
 import Slider from 'rc-slider';
 
@@ -8,6 +14,7 @@ import { FiChevronRight } from 'react-icons/fi';
 
 import { usePlayer } from 'hooks/player';
 
+import { convertDurationToTimeString } from 'utils/functions';
 import {
   Container,
   CollapseButton,
@@ -21,21 +28,52 @@ import {
 
 const Player: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const {
     episodeList,
     currentEpisodeIndex,
     isPlaying,
+    isLooping,
+    isShuffling,
+    hasNext,
+    hasPrevious,
     setPlayingState,
+    toggleLoop,
     togglePlay,
+    toggleShufle,
+    handleChangeItem,
+    clearPLayerState,
   } = usePlayer();
+
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const setupAudigoProgressListener = useCallback(() => {
+    audioRef.current.currentTime = 0;
+
+    audioRef.current.addEventListener('timeupdate', () => {
+      setProgress(Math.floor(audioRef.current.currentTime));
+    });
+  }, [audioRef]);
+
+  const handleMoveSlider = useCallback((progressTime: number) => {
+    audioRef.current.currentTime = progressTime;
+    setProgress(progressTime);
+  }, []);
+
+  const handleEpisodeEnded = useCallback(() => {
+    setProgress(0);
+    if (hasNext) {
+      handleChangeItem('next');
+    } else {
+      clearPLayerState();
+    }
+  }, [handleChangeItem, hasNext, clearPLayerState]);
 
   const episode = useMemo(() => episodeList[currentEpisodeIndex], [
     episodeList,
     currentEpisodeIndex,
   ]);
-
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     if (!audioRef.current) {
@@ -80,10 +118,13 @@ const Player: React.FC = () => {
         )}
         <Footer empty={!episode}>
           <Progress at={1}>
-            <span>00:00</span>
+            <span>{convertDurationToTimeString(progress)}</span>
             <SliderWrapper>
               {episode ? (
                 <Slider
+                  max={episode.duration}
+                  value={progress}
+                  onChange={handleMoveSlider}
                   trackStyle={{
                     backgroundColor: '#04d361',
                   }}
@@ -99,7 +140,7 @@ const Player: React.FC = () => {
                 <div className="slider" />
               )}
             </SliderWrapper>
-            <span>00:00</span>
+            <span>{convertDurationToTimeString(episode?.duration ?? 0)}</span>
           </Progress>
 
           {episode && (
@@ -107,18 +148,29 @@ const Player: React.FC = () => {
               src={episode.url}
               ref={audioRef}
               autoPlay
+              loop={isLooping}
               onPlay={() => setPlayingState(true)}
               onPause={() => setPlayingState(false)}
+              onEnded={handleEpisodeEnded}
+              onLoadedMetadata={setupAudigoProgressListener}
             >
               <track src="" kind="captions" srcLang="pt" label="pt_captions" />
             </audio>
           )}
-
           <ButtonsContainer>
-            <button type="button" disabled={!episode}>
+            <button
+              type="button"
+              disabled={!episode || episodeList.length === 1}
+              onClick={toggleShufle}
+              className={isShuffling ? 'active-button' : ''}
+            >
               <img src="/shuffle.svg" alt="shuffle icon" />
             </button>
-            <button type="button" disabled={!episode}>
+            <button
+              type="button"
+              onClick={() => handleChangeItem('previous')}
+              disabled={!episode || (!hasPrevious && !isShuffling)}
+            >
               <img src="/play-previous.svg" alt="play previous" />
             </button>
 
@@ -135,11 +187,20 @@ const Player: React.FC = () => {
               )}
             </button>
 
-            <button type="button" disabled={!episode}>
+            <button
+              type="button"
+              onClick={() => handleChangeItem('next')}
+              disabled={!episode || (!hasNext && !isShuffling)}
+            >
               <img src="/play-next.svg" alt="play next" />
             </button>
 
-            <button type="button" disabled={!episode}>
+            <button
+              type="button"
+              disabled={!episode}
+              onClick={toggleLoop}
+              className={isLooping ? 'active-button' : ''}
+            >
               <img src="/repeat.svg" alt="repeat" />
             </button>
           </ButtonsContainer>

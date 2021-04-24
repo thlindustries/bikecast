@@ -50,14 +50,21 @@ export const LatestEpisodes = styled.section`
     img {
       width: 1.5rem;
       height: 1.5rem;
+    }
+    svg {
+      color: var(--green-500);
+    }
 
+    img,
+    svg {
       transition: transform 0.2s;
     }
 
     transition: filter 0.2s;
     &:hover {
       filter: brightness(0.95);
-      img {
+      img,
+      svg {
         transform: scale(1.2);
       }
     }
@@ -118,14 +125,21 @@ export const AllEpisodes = styled.section`
         img {
           width: 1.25rem;
           height: 1.5rem;
+        }
+        svg {
+          color: var(--green-500);
+        }
 
+        img,
+        svg {
           transition: transform 0.2s;
         }
 
         transition: filter 0.2s;
         &:hover {
           filter: brightness(0.95);
-          img {
+          img,
+          svg {
             transform: scale(1.2);
           }
         }

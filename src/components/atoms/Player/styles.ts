@@ -166,6 +166,9 @@ export const Footer = styled.footer<FooterProps>`
     props.empty &&
     css`
       opacity: 0.5;
+      button:disabled {
+        opacity: unset;
+      }
     `}
 `;
 
@@ -216,6 +219,15 @@ export const ButtonsContainer = styled.div`
     border: 0;
     font-size: 0;
 
+    &.active-button {
+      filter: invert(0.35) sepia(1) saturate(3) hue-rotate(100deg);
+
+      &:hover {
+        filter: brightness(0.6) invert(0.35) sepia(1) saturate(3)
+          hue-rotate(100deg);
+      }
+    }
+
     &.play-button {
       width: 4rem;
       height: 4rem;
@@ -226,6 +238,7 @@ export const ButtonsContainer = styled.div`
 
     &:disabled {
       cursor: default;
+      opacity: 0.4;
     }
 
     transition: 0.2s;

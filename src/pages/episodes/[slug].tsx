@@ -2,11 +2,13 @@ import React, { useEffect } from 'react';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
+import { FaPause } from 'react-icons/fa';
 
 import { format, parseISO } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
 import { convertDurationToTimeString } from 'utils/functions';
+import { usePlayer } from 'hooks/player';
 import api from 'services/api';
 
 import {
@@ -15,8 +17,9 @@ import {
   Header,
   EpisodeDescription,
 } from 'styles/pages/episodes';
+import Seo from 'components/atoms/Seo';
 
-type Episode = {
+type EpisodeType = {
   id: string;
   title: string;
   members: string;
@@ -47,6 +50,7 @@ type EpisodeProps = {
 
 const Episode: React.FunctionComponent<EpisodeProps> = ({ episode }) => {
   const { push } = useRouter();
+  const { play, isPlaying, setPlayingState } = usePlayer();
 
   useEffect(() => {
     const descriptionContainer = document.getElementsByClassName(
@@ -59,38 +63,50 @@ const Episode: React.FunctionComponent<EpisodeProps> = ({ episode }) => {
   }, [episode.description]);
 
   return (
-    <Container>
-      <ThumbContainer>
-        <button onClick={() => push('/')} type="button">
-          <img src="/arrow-left.svg" alt="back arrow" />
-        </button>
-        <Image
-          width={700}
-          height={160}
-          src={episode.thumbnail}
-          objectFit="cover"
-        />
-        <button type="button">
-          <img src="/play.svg" alt="change episode" />
-        </button>
-      </ThumbContainer>
+    <>
+      <Seo title={episode.title} />
+      <Container>
+        <ThumbContainer>
+          <button onClick={() => push('/')} type="button">
+            <img src="/arrow-left.svg" alt="back arrow" />
+          </button>
+          <Image
+            width={700}
+            height={160}
+            src={episode.thumbnail}
+            objectFit="cover"
+          />
+          <button
+            type="button"
+            onClick={
+              isPlaying ? () => setPlayingState(false) : () => play(episode)
+            }
+          >
+            {isPlaying ? (
+              <FaPause size={16} />
+            ) : (
+              <img src="/play.svg" alt="play episode" />
+            )}
+          </button>
+        </ThumbContainer>
 
-      <Header>
-        <h1>{episode.title}</h1>
-        <span>{episode.members}</span>
-        <span>{episode.publishedAt}</span>
-        <span>{episode.durationAsString}</span>
-      </Header>
+        <Header>
+          <h1>{episode.title}</h1>
+          <span>{episode.members}</span>
+          <span>{episode.publishedAt}</span>
+          <span>{episode.durationAsString}</span>
+        </Header>
 
-      <EpisodeDescription className="episode-description" />
-    </Container>
+        <EpisodeDescription className="episode-description" />
+      </Container>
+    </>
   );
 };
 
 export default Episode;
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { data } = await api.get<Episode[]>('episodes', {
+  const { data } = await api.get<EpisodeType[]>('episodes', {
     params: {
       _limit: 2,
       _sort: 'published_at',
