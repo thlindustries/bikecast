@@ -133,7 +133,7 @@ const Home: React.FunctionComponent<HomeProps> = ({
                     />
                   </td>
                   <td>
-                    <Link href="_blank">
+                    <Link href={`/episodes/${episode.id}`}>
                       <span className="episode-title-link">
                         {episode.title}
                       </span>
