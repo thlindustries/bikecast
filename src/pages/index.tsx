@@ -75,7 +75,7 @@ const Home: React.FunctionComponent<HomeProps> = ({
             {latestEpisodes.map((episode, index) => (
               <li key={episode.id}>
                 <Image
-                  width={192}
+                  width={194}
                   height={192}
                   src={episode.thumbnail}
                   alt={episode.title}
