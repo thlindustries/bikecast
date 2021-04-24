@@ -28,7 +28,9 @@ Neste projeto a ideia é compartilhar uma base de dados de poadcasts sobre temas
 
 As seguintes ferramentas foram usadas na construção do projeto:
 
-- [React Native][rn]
+- [Next Js][next]
+- [Node][nodejs]
+- [React JS][reactjs]
 - [TypeScript][typescript]
 
 ## 🚀 Como executar o projeto
@@ -79,6 +81,7 @@ Este projeto esta sobe a licença MIT.
 Feito com ❤️ por Thiago Lorente Kraetzer 👋🏽 [Entre em contato!](https://www.linkedin.com/in/thiago-kraetzer/)
 
 [nodejs]: https://nodejs.org/
+[next]: https://nextjs.org/
 [typescript]: https://www.typescriptlang.org/
 [reactjs]: https://reactjs.org
 [yarn]: https://yarnpkg.com/
