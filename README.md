@@ -11,7 +11,7 @@
 
 
   <img alt="License" src="https://img.shields.io/badge/license-MIT-brightgreen">
-   <a href="https://github.com/tgmarinho/nlw1/stargazers">
+   <a href="https://github.com/thlindustries/bikecast/stargazers">
     <img alt="Stargazers" src="https://img.shields.io/github/stars/thlindustries/bikecast?style=plastic">
   </a>
 </p>
